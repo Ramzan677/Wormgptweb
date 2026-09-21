@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worm AI - Vision & Speech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Markdown Parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Code Highlight -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+    <style>
+        /* Modern Clean Layout Typography */
+        .ai-response-container {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        .markdown-content h1, 
+        .markdown-content h2, 
+        .markdown-content h3, 
+        .markdown-content h4 {
+            color: #0f172a;
+            font-weight: 700;
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .markdown-content h1 { font-size: 1.35rem; }
+        .markdown-content h2 { font-size: 1.2rem; }
+        .markdown-content h3 { font-size: 1.05rem; }
+
+        .markdown-content p {
+            margin-bottom: 0.75rem;
+            color: #334155;
+            font-size: 0.938rem;
+        }
+
+        .markdown-content strong {
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        /* Lists Formatting */
+        .markdown-content ul, 
+        .markdown-content ol {
+            margin-top: 0.5rem;
+            margin-bottom: 0.85rem;
+            padding-left: 1.5rem;
+        }
+
+        .markdown-content ul { list-style-type: disc; }
+        .markdown-content ol { list-style-type: decimal; }
+
+        .markdown-content li {
+            margin-bottom: 0.4rem;
+            color: #334155;
+            font-size: 0.938rem;
+        }
+
+        .markdown-content li::marker {
+            color: #059669;
+            font-weight: bold;
+        }
+
+        /* Inline Code Badge */
+        .markdown-content :not(pre) > code {
+            background-color: #e2e8f0;
+            color: #0f172a;
+            padding: 0.15rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            font-size: 0.85em;
+        }
+
+        /* Code Block Container */
+        .markdown-content pre {
+            background-color: #0f172a !important;
+            border-radius: 0.75rem;
+            margin: 1rem 0;
+            overflow: hidden;
+            border: 1px solid #1e293b;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .code-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #1e293b;
+            padding: 0.4rem 0.85rem;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            border-bottom: 1px solid #334155;
+        }
+
+        .markdown-content pre code {
+            display: block;
+            padding: 1rem;
+            overflow-x: auto;
+            color: #f8fafc;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .copy-btn {
+            background-color: #334155;
+            color: #f8fafc;
+            border: none;
+            padding: 0.2rem 0.6rem;
+            border-radius: 0.35rem;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover { background-color: #475569; }
+    </style>
+</head>
+<body class="h-full bg-slate-100 text-slate-800 font-sans flex flex-col">
+
+    <!-- Top Header -->
+    <header class="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-sm">W</div>
+            <div>
+                <h1 class="font-bold text-slate-900 text-sm leading-none">Worm AI Assistant</h1>
+                <span class="text-[11px] text-slate-500">Vision OCR & Dynamic Memory</span>
+            </div>
+        </div>
+        <div class="text-xs text-slate-600">
+            Dev: <strong class="text-emerald-600">Ramzan Ahsan</strong>
+        </div>
+    </header>
+
+    <!-- Chat Area -->
+    <main id="messages-container" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 max-w-4xl mx-auto w-full">
+        <div id="welcome-screen" class="h-full flex flex-col items-center justify-center text-center my-auto py-12">
+            <div class="w-16 h-16 rounded-2xl bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-600 text-2xl mb-3">
+                <i class="fa-solid fa-comments"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900">AI Assistance Panel</h2>
+            <p class="text-slate-500 text-xs mt-1">Image analysis, clean text responses & voice synthesis</p>
+            <a href="https://chat.whatsapp.com/FiZBn0BykHX47d1iHLOay1" target="_blank" class="mt-4 inline-flex items-center gap-2 px-3.5 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold shadow hover:bg-emerald-700 transition">
+                <i class="fa-brands fa-whatsapp text-sm"></i> Join WhatsApp Group
+            </a>
+        </div>
+    </main>
+
+    <!-- File Attachment Preview -->
+    <div id="attachment-preview" class="hidden max-w-4xl mx-auto w-full px-4 mb-2">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-700 shadow-sm">
+            <i class="fa-solid fa-image text-emerald-600"></i>
+            <span id="preview-filename" class="font-mono text-[11px] truncate max-w-[200px]">image.jpg</span>
+            <button id="remove-file-btn" class="ml-2 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+    </div>
+
+    <!-- Input Bar Section -->
+    <div class="bg-white border-t border-slate-200 p-3 shadow-lg">
+        <div class="max-w-4xl mx-auto">
+            <form id="chat-form" class="flex items-center gap-2 bg-slate-50 border border-slate-300 focus-within:border-emerald-500 focus-within:bg-white rounded-xl p-2 transition">
+                <input type="file" id="file-input" class="hidden" accept="image/*">
+                <button type="button" id="attach-btn" class="p-2 text-slate-500 hover:text-emerald-600 transition">
+                    <i class="fa-solid fa-paperclip text-base"></i>
+                </button>
+                
+                <textarea id="user-input" rows="1" placeholder="write your question" class="flex-1 bg-transparent text-slate-800 text-sm focus:outline-none resize-none px-2 py-1"></textarea>
+
+                <button type="submit" id="send-btn" disabled class="px-4 py-2 bg-emerald-600/40 text-white rounded-lg flex items-center gap-2 text-xs font-semibold shrink-0 transition">
+                    <span id="send-btn-text">Send</span>
+                    <i id="send-btn-icon" class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const BASE_API = 'https://wormapi-coral.vercel.app/'; // Production Server Endpoint
+        let selectedFile = null;
+        let activeAudioButton = null;
+        let currentChatId = null;
+
+        const chatForm = document.getElementById('chat-form');
+        const userInput = document.getElementById('user-input');
+        const fileInput = document.getElementById('file-input');
+        const attachBtn = document.getElementById('attach-btn');
+        const sendBtn = document.getElementById('send-btn');
+        const sendBtnText = document.getElementById('send-btn-text');
+        const sendBtnIcon = document.getElementById('send-btn-icon');
+        const attachmentPreview = document.getElementById('attachment-preview');
+        const previewFilename = document.getElementById('preview-filename');
+        const removeFileBtn = document.getElementById('remove-file-btn');
+        const messagesContainer = document.getElementById('messages-container');
+        const welcomeScreen = document.getElementById('welcome-screen');
+
+        function updateSendButton() {
+            const hasText = userInput.value.trim().length > 0;
+            const hasFile = selectedFile !== null;
+            if (hasText || hasFile) {
+                sendBtn.disabled = false;
+                sendBtn.className = "px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer rounded-lg flex items-center gap-2 text-xs font-semibold shrink-0 shadow transition";
+            } else {
+                sendBtn.disabled = true;
+                sendBtn.className = "px-4 py-2 bg-emerald-600/40 text-white cursor-not-allowed rounded-lg flex items-center gap-2 text-xs font-semibold shrink-0 transition";
+            }
+        }
+
+        userInput.addEventListener('input', updateSendButton);
+        attachBtn.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) {
+                selectedFile = e.target.files[0];
+                previewFilename.textContent = selectedFile.name;
+                attachmentPreview.classList.remove('hidden');
+                updateSendButton();
+            }
+        });
+
+        removeFileBtn.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            attachmentPreview.classList.add('hidden');
+            updateSendButton();
+        });
+
+        function convertBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        async function playSpeech(speechUrl, btnElement) {
+            const icon = btnElement.querySelector('i');
+
+            if (btnElement.audioInstance) {
+                if (!btnElement.audioInstance.paused) {
+                    btnElement.audioInstance.pause();
+                    icon.className = "fa-solid fa-volume-high";
+                    return;
+                } else {
+                    if (activeAudioButton && activeAudioButton !== btnElement) {
+                        stopAudio(activeAudioButton);
+                    }
+                    btnElement.audioInstance.play();
+                    icon.className = "fa-solid fa-pause text-emerald-600";
+                    activeAudioButton = btnElement;
+                    return;
+                }
+            }
+
+            if (activeAudioButton) {
+                stopAudio(activeAudioButton);
+            }
+
+            try {
+                icon.className = "fa-solid fa-spinner fa-spin text-emerald-600";
+                
+                const audio = new Audio(speechUrl);
+                btnElement.audioInstance = audio;
+                activeAudioButton = btnElement;
+
+                audio.addEventListener('canplaythrough', () => {
+                    icon.className = "fa-solid fa-pause text-emerald-600";
+                    audio.play();
+                });
+
+                audio.addEventListener('ended', () => {
+                    icon.className = "fa-solid fa-volume-high";
+                    btnElement.audioInstance = null;
+                    activeAudioButton = null;
+                });
+
+                audio.addEventListener('error', () => {
+                    icon.className = "fa-solid fa-volume-xmark text-red-500";
+                    btnElement.audioInstance = null;
+                    activeAudioButton = null;
+                });
+
+            } catch (err) {
+                icon.className = "fa-solid fa-volume-xmark text-red-500";
+                btnElement.audioInstance = null;
+                activeAudioButton = null;
+            }
+        }
+
+        function stopAudio(btnElement) {
+            if (btnElement && btnElement.audioInstance) {
+                btnElement.audioInstance.pause();
+                btnElement.audioInstance.currentTime = 0;
+                btnElement.audioInstance = null;
+                const icon = btnElement.querySelector('i');
+                if (icon) icon.className = "fa-solid fa-volume-high";
+            }
+            activeAudioButton = null;
+        }
+
+        function copyCodeBlock(btn) {
+            const pre = btn.closest('pre');
+            const code = pre.querySelector('code').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                btn.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> Copied!';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy';
+                }, 2000);
+            });
+        }
+
+        function renderCleanMarkdown(markdownText) {
+            const rawHtml = marked.parse(markdownText);
+            const container = document.createElement('div');
+            container.className = 'markdown-content';
+            container.innerHTML = rawHtml;
+
+            container.querySelectorAll('pre').forEach((pre) => {
+                const codeBlock = pre.querySelector('code');
+                let lang = 'code';
+                if (codeBlock) {
+                    const match = codeBlock.className.match(/language-(\w+)/);
+                    if (match) lang = match[1];
+                }
+
+                const headerBar = document.createElement('div');
+                headerBar.className = 'code-header-bar';
+                headerBar.innerHTML = `
+                    <span>${lang}</span>
+                    <button type="button" class="copy-btn" onclick="copyCodeBlock(this)">
+                        <i class="fa-regular fa-copy"></i> Copy
+                    </button>`;
+                pre.insertBefore(headerBar, pre.firstChild);
+            });
+
+            return container.innerHTML;
+        }
+
+        function streamTextToElement(targetElement, fullText, speed = 10, onComplete) {
+            let index = 0;
+            targetElement.innerHTML = '';
+            
+            function typeNext() {
+                if (index < fullText.length) {
+                    const chunkSize = Math.min(3, fullText.length - index);
+                    index += chunkSize;
+                    
+                    const currentText = fullText.substring(0, index);
+                    targetElement.innerHTML = renderCleanMarkdown(currentText);
+                    
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    setTimeout(typeNext, speed);
+                } else {
+                    targetElement.querySelectorAll('pre code').forEach((block) => {
+                        hljs.highlightElement(block);
+                    });
+                    if (onComplete) onComplete();
+                }
+            }
+            typeNext();
+        }
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = userInput.value.trim() || "Kya likha hai?";
+            const fileToUpload = selectedFile;
+            
+            selectedFile = null;
+            fileInput.value = '';
+            userInput.value = '';
+            attachmentPreview.classList.add('hidden');
+            updateSendButton();
+
+            sendBtn.disabled = true;
+            sendBtnText.textContent = "Processing...";
+            sendBtnIcon.className = "fa-solid fa-spinner fa-spin";
+
+            if (welcomeScreen) welcomeScreen.remove();
+
+            messagesContainer.innerHTML += `
+                <div class="flex justify-end w-full">
+                    <div class="max-w-[85%] bg-emerald-600 text-white p-3.5 rounded-2xl rounded-tr-none text-sm shadow">
+                        ${fileToUpload ? `<div class="text-xs bg-emerald-700/80 p-1.5 rounded-lg mb-1.5 font-mono"><i class="fa-solid fa-paperclip"></i> ${fileToUpload.name}</div>` : ''}
+                        <p class="whitespace-pre-wrap">${text}</p>
+                    </div>
+                </div>`;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            try {
+                let payload = { 
+                    user_input: text, 
+                    chat_id: currentChatId, 
+                    attachments: [] 
+                };
+
+                if (fileToUpload) {
+                    const base64 = await convertBase64(fileToUpload);
+                    payload.attachments.push(base64);
+                }
+
+                const res = await fetch(`${BASE_API}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                
+                if (data.chat_id) currentChatId = data.chat_id;
+
+                const botReply = data.text_response || "No response received";
+                const speechUrl = data.speech_url;
+
+                const msgId = 'bot-msg-' + Date.now();
+                
+                messagesContainer.innerHTML += `
+                    <div class="flex justify-start w-full">
+                        <div class="flex items-start gap-3 max-w-[95%] w-full">
+                            <div class="w-8 h-8 rounded-xl bg-emerald-600 flex items-center justify-center text-white text-xs mt-1 shrink-0 shadow">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <div class="ai-response-container bg-emerald-50/60 border border-emerald-200/80 text-slate-800 p-4 rounded-2xl rounded-tl-none w-full shadow-sm">
+                                <div id="${msgId}" class="markdown-content"></div>
+                                <div id="${msgId}-audio"></div>
+                            </div>
+                        </div>
+                    </div>`;
+
+                const targetDiv = document.getElementById(msgId);
+                const audioDiv = document.getElementById(`${msgId}-audio`);
+
+                streamTextToElement(targetDiv, botReply, 10, () => {
+                    if (speechUrl) {
+                        audioDiv.innerHTML = `
+                            <button onclick="playSpeech('${speechUrl}', this)" class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-lg text-xs font-semibold transition">
+                                <i class="fa-solid fa-volume-high"></i>
+                                <span>Listen Voice</span>
+                            </button>`;
+                    }
+                });
+
+            } catch (err) {
+                messagesContainer.innerHTML += `<div class="text-red-500 text-xs text-center p-2 font-medium">Connection error. Please check your backend.</div>`;
+            } finally {
+                sendBtnText.textContent = "Send";
+                sendBtnIcon.className = "fa-solid fa-paper-plane";
+                updateSendButton();
+            }
+        });
+    </script>
+</body>
+</html>
